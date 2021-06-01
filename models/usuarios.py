@@ -2,11 +2,12 @@ from config.connection import Connection
 
 
 class Usuarios:
-    def __init__(self, nombres, correo, dni, celular, admin=False):
+    def __init__(self, nombres, correo, dni, celular, password, admin=False):
         self.nombres = nombres
         self.correo = correo
         self.dni = dni
         self.celular = celular
+        self.password = password
         self.admin = admin
 
     @classmethod
@@ -37,6 +38,7 @@ class Usuarios:
                     "correo": self.correo,
                     "dni": self.dni,
                     "celular": self.celular,
+                    "password": self.password,
                     "admin": self.admin,
                 }
             )
@@ -50,13 +52,14 @@ class Usuarios:
         admin = False
         conn = Connection("usuarios")
         query = f"""
-            SELECT correo, password, admin FROM usuarios
+            SELECT id, password, admin FROM usuarios
             WHERE correo = '{email}'
         """
         records = conn.execute_my_query(query)
+        id = records[0][0]
         if records:
             if records[0][1] == str(password):
                 login = True
             if records[0][2] == True:
                 admin = True
-        return login, admin
+        return login, admin, id

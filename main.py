@@ -1,11 +1,16 @@
+from datetime import date, timedelta
 from config.connection import Connection
 from models.autores import Autores
 from models.editoriales import Editoriales
 from models.libros import Libros
 from models.usuarios import Usuarios
+from models.prestamos import Prestamos
 
 
 class Biblioteca:
+    user_id = None
+    loan_time = 10
+
     def __init__(self):
         self.login()
 
@@ -20,12 +25,17 @@ class Biblioteca:
                 )
                 usuario = input("Ingrese su correo: ")
                 contra = input("Ingrese su contraseña: ")
-                login, admin = Usuarios.find_and_validate(usuario, contra)
-                print(login, admin)
-                if login and admin:
+                ##devuelve el user_id si logra autenticar
+                login_valid, admin, self.user_id = Usuarios.find_and_validate(
+                    usuario, contra
+                )
+                print(self.user_id)
+                if login_valid and admin:
                     self.interfaz_admin()
-                elif login:
+                elif login_valid:
                     self.interfaz_lector()
+                else:
+                    print("Usuario o contraseña incorrecta, intente otra vez!")
         except Exception as e:
             print(e)
 
@@ -43,15 +53,26 @@ class Biblioteca:
                 )
                 opcion = input(">")
                 if opcion == "1":
-                    self.interfaz_alumno()
+                    pass
                 if opcion == "2":
-                    self.interfaz_profesor()
+                    self.prestar_libro()
                 if opcion == "3":
                     exit()
                 else:
                     print("Ingrese una opción válida")
         except Exception as e:
             print(e)
+
+    def prestar_libro(self):
+        Libros.libros_disponibles(True)
+        libro_id = input("Selecciona el ID del libro que desea prestarse > ")
+        seguro = input(f"Seguro que desea prestarse el libro {libro_id}? Y/N > ")
+        if seguro == "Y" or seguro == "y":
+            fecha_pres = date.today()
+            fecha_dev = date.today() + timedelta(days=self.loan_time)
+            Prestamos(self.user_id, libro_id, fecha_pres, fecha_dev)
+            Libros.disponible(libro_id, False)
+            print(f"No se olvide que la fecha de entrega del libro es {fecha_dev}")
 
     def interfaz_admin(self):
         try:
@@ -174,20 +195,25 @@ class Biblioteca:
     def ingresar_usuario(self):
         nombres = input("Ingrese los nombres del usuario > ")
         correo = input("Ingrese el correo del usuario > ")
+        password = input("Ingrese el password del usuario > ")
         dni = input("Ingrese el dni del usuario > ")
         celular = input("Ingrese el celular del usuario > ")
         while True:
             admin = input("El usuarios es administrador? Y/N > ")
             if admin == "Y" or admin == "y":
                 admin = True
+                Usuarios(
+                    nombres, correo, dni, celular, password, admin
+                ).insert_usuario()
                 break
             if admin == "N" or admin == "n":
                 admin = False
+                Usuarios(
+                    nombres, correo, dni, celular, password, admin
+                ).insert_usuario()
                 break
             else:
                 print("Ingrese una opción válida")
-
-        Usuarios(nombres, correo, dni, celular, admin).insert_usuario()
 
     def ingresar_libro(self):
         nombre = input("Ingrese nombre del libro > ")
@@ -200,4 +226,5 @@ class Biblioteca:
 
 
 Biblioteca()
+
 # login, admin = Usuarios.find_and_validate("hnawrocki@test.com", 12345)

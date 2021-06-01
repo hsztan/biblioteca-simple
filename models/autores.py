@@ -26,13 +26,3 @@ class Autores:
             print(f"Se registro el aescolar: {self.nombres}")
         except Exception as e:
             print(e)
-
-    def update_aescolar(self):
-        try:
-            conn = Connection("aescolar")
-            conn.update(
-                {"id": 8, "modelo": "Motorola"},
-                {"precio": self.precio, "modelo": "Motorola 2021"},
-            )
-        except Exception as e:
-            print(e)

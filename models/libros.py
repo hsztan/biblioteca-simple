@@ -31,6 +31,29 @@ class Libros:
         except Exception as e:
             print(e)
 
+    @classmethod
+    def libros_disponibles(cls, disponible=True):
+        try:
+            conn = Connection("libros")
+            query = f"""
+                SELECT l.id, l.nombre, a.nombres, e.nombre, l.disponible FROM libros l
+                JOIN autores a ON l.autor_id = a.id
+                JOIN editoriales e ON l.editorial_id = e.id
+                WHERE disponible = {disponible}
+            """
+            records = conn.execute_my_query(query)
+
+            for record in records:
+                print(f"ID: {record[0]}")
+                print(f"Nombre: {record[1]}")
+                print(f"Autor: {record[2]}")
+                print(f"Editorial: {record[3]}")
+                print(f"Disponibilidad: {record[4]}")
+                print("=====================")
+            return records
+        except Exception as e:
+            print(e)
+
     def insert_libro(self):
         try:
             conn = Connection("libros")
@@ -44,5 +67,20 @@ class Libros:
                 }
             )
             print(f"Se registro la editorial: {self.nombre}")
+        except Exception as e:
+            print(e)
+
+    @classmethod
+    def disponible(cls, id, data):
+        try:
+            print(id, data)
+            conn = Connection("libros")
+            conn.update(
+                {"id": id},
+                {
+                    "disponible": data,
+                },
+            )
+            # print(f'Se registro el modelo: {self.modelo} con el precio {self.precio}')
         except Exception as e:
             print(e)
