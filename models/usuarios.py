@@ -43,3 +43,20 @@ class Usuarios:
             print(f"Se registro el usuario: {self.nombres}")
         except Exception as e:
             print(e)
+
+    @classmethod
+    def find_and_validate(cls, email, password):
+        login = False
+        admin = False
+        conn = Connection("usuarios")
+        query = f"""
+            SELECT correo, password, admin FROM usuarios
+            WHERE correo = '{email}'
+        """
+        records = conn.execute_my_query(query)
+        if records:
+            if records[0][1] == str(password):
+                login = True
+            if records[0][2] == True:
+                admin = True
+        return login, admin

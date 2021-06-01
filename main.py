@@ -20,7 +20,12 @@ class Biblioteca:
                 )
                 usuario = input("Ingrese su correo: ")
                 contra = input("Ingrese su contraseña: ")
-                self.interfaz_admin()
+                login, admin = Usuarios.find_and_validate(usuario, contra)
+                print(login, admin)
+                if login and admin:
+                    self.interfaz_admin()
+                elif login:
+                    self.interfaz_lector()
         except Exception as e:
             print(e)
 
@@ -195,3 +200,4 @@ class Biblioteca:
 
 
 Biblioteca()
+# login, admin = Usuarios.find_and_validate("hnawrocki@test.com", 12345)
