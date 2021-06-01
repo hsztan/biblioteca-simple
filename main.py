@@ -1,5 +1,4 @@
 from datetime import date, timedelta
-from config.connection import Connection
 from models.autores import Autores
 from models.editoriales import Editoriales
 from models.libros import Libros
@@ -70,7 +69,9 @@ class Biblioteca:
         if seguro == "Y" or seguro == "y":
             fecha_pres = date.today()
             fecha_dev = date.today() + timedelta(days=self.loan_time)
-            Prestamos(self.user_id, libro_id, fecha_pres, fecha_dev).insert_prestamo()
+            Prestamos(
+                self.user_id, libro_id, str(fecha_pres), str(fecha_dev)
+            ).insert_prestamo()
             Libros.disponible(libro_id, False)
             print(f"No se olvide que la fecha de entrega del libro es {fecha_dev}")
 
